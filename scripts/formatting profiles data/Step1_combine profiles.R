@@ -145,3 +145,4 @@ allProfilesCombined = rbind(allProfiles22, all.prof24)
 write.csv(allProfilesCombined, "./data/raw data/profiles/profiles 2022 and 2024 raw.csv", row.names = FALSE)
 save(allProfilesCombined, file = "./data/raw data/profiles/profiles 2022 and 2024 raw.RData")
 
+
