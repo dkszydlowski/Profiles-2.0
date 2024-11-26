@@ -10,32 +10,63 @@ plot_profiles_heatmap = function(data, plot.year, plot.variable, plot.lake, log.
   # filter data to our desired data, and exclude couple of points when we tested
   # sampling at deeper depths
   
-  if(plot.lake != "all"){
+  if(plot.lake != "all" & plot.year != "all"){
   data = data %>% filter(year == plot.year, lake == plot.lake, depth <= 8)
   
-  ggplot(data, aes_string("doy", "depth", fill = plot.variable))+
+  print(ggplot(data, aes_string("doy", "depth", fill = plot.variable))+
     geom_tile()+
     #labs(title = if(lake_picked == "T") {"Tuesday"}else if(lake_picked == "L"){"Paul"} else if (lake_picked == "R"){"Peter"})+
     theme_classic()+
     scale_y_reverse()+
     #facet_wrap(~lake)+
     #scale_fill_distiller(palette = "BrBG")
-    scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+    scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse"))
   }
   
   
-  if(plot.lake == "all"){
+  if(plot.lake == "all" & plot.year != "all"){
     
     data = data %>% filter(year == plot.year, depth <= 8)
     
-    ggplot(data, aes_string("doy", "depth", fill = plot.variable))+
+    print(ggplot(data, aes_string("doy", "depth", fill = plot.variable))+
       geom_tile()+
       #labs(title = if(lake_picked == "T") {"Tuesday"}else if(lake_picked == "L"){"Paul"} else if (lake_picked == "R"){"Peter"})+
       theme_classic()+
       scale_y_reverse()+
       facet_wrap(~lake)+
       #scale_fill_distiller(palette = "BrBG")
-      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse"))
+    
+  }
+  
+  
+  if(plot.lake == "all" & plot.year == "all"){
+    data = data %>% filter(depth <= 8)
+    
+   print( ggplot(data, aes_string("doy", "depth", fill = plot.variable))+
+      geom_tile()+
+      #labs(title = if(lake_picked == "T") {"Tuesday"}else if(lake_picked == "L"){"Paul"} else if (lake_picked == "R"){"Peter"})+
+      theme_classic()+
+      scale_y_reverse()+
+      facet_grid(year~lake)+
+      #scale_fill_distiller(palette = "BrBG")
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse"))
+    
+  }
+  
+  
+  
+  if(plot.lake != "all" & plot.year == "all"){
+    data = data %>% filter(depth <= 8, lake == plot.lake)
+    
+    print(ggplot(data, aes_string("doy", "depth", fill = plot.variable))+
+      geom_tile()+
+      #labs(title = if(lake_picked == "T") {"Tuesday"}else if(lake_picked == "L"){"Paul"} else if (lake_picked == "R"){"Peter"})+
+      theme_classic()+
+      scale_y_reverse()+
+      facet_grid(~year)+
+      #scale_fill_distiller(palette = "BrBG")
+      scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse"))
     
   }
 }
