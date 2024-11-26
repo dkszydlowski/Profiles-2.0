@@ -1,0 +1,1 @@
+# calculate manual chlorophyll for 2024 from the fluorescence values
