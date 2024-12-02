@@ -38,6 +38,9 @@ prof.cal = prof.cal %>% mutate(do_mgL = replace(do_mgL, lake == "R" & year == 20
 # verify by plotting
 plot_profiles_heatmap(prof.cal, 2024, "do_mgL", plot.lake = "all", log.trans = TRUE)
 
+# fix temp on doy 230 in Tuesday, something appears off
+prof.cal = prof.cal %>% mutate(do_percent = replace(do_percent, lake == "T" & year == 2024 & doy == 230, NA))
+
 
 #### 2022 ####
 # there is very high, abnormal DO on doy 173 in L and R

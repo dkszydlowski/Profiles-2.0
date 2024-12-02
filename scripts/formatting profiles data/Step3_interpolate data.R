@@ -51,7 +51,9 @@ prof.clean.22 = prof.clean.22 %>%
          do_percent = na.approx(do_percent, na.rm = FALSE, rule = 2),
          SPC = na.approx(SPC, na.rm = FALSE, rule = 2),
          phyco_cells = na.approx(phyco_cells, na.rm = FALSE, rule = 2),
-         pH = na.approx(pH, na.rm = FALSE, rule = 2))
+         pH = na.approx(pH, na.rm = FALSE, rule = 2),
+         temp = na.approx(temp, na.rm = FALSE, rule = 2),
+         do_mgL = na.approx(do_mgL, na.rm = FALSE, rule = 2))
 
 
 prof.clean.24 = prof.clean.24 %>% 
@@ -61,7 +63,9 @@ prof.clean.24 = prof.clean.24 %>%
          do_percent = na.approx(do_percent, na.rm = FALSE, rule = 2),
          SPC = na.approx(SPC, na.rm = FALSE, rule = 2),
          phyco_cells = na.approx(phyco_cells, na.rm = FALSE, rule = 2),
-         pH = na.approx(pH, na.rm = FALSE, rule = 2))
+         pH = na.approx(pH, na.rm = FALSE, rule = 2),
+         temp = na.approx(temp, na.rm = FALSE, rule = 2),
+         do_mgL = na.approx(do_mgL, na.rm = FALSE, rule = 2))
 
 
 prof.clean = rbind(prof.clean.22, prof.clean.24)
@@ -99,7 +103,9 @@ prof.clean.22.time = prof.clean.22 %>%
          do_percent = na.approx(do_percent, na.rm = FALSE, rule = 2),
          SPC = na.approx(SPC, na.rm = FALSE, rule = 2),
          phyco_cells = na.approx(phyco_cells, na.rm = FALSE, rule = 2),
-         pH = na.approx(pH, na.rm = FALSE, rule = 2))
+         pH = na.approx(pH, na.rm = FALSE, rule = 2),
+         temp = na.approx(temp, na.rm = FALSE, rule = 2),
+         do_mgL = na.approx(do_mgL, na.rm = FALSE, rule = 2))
 
 
 prof.clean.24.time = prof.clean.24 %>% 
@@ -109,7 +115,9 @@ prof.clean.24.time = prof.clean.24 %>%
          do_percent = na.approx(do_percent, na.rm = FALSE, rule = 2),
          SPC = na.approx(SPC, na.rm = FALSE, rule = 2),
          phyco_cells = na.approx(phyco_cells, na.rm = FALSE, rule = 2),
-         pH = na.approx(pH, na.rm = FALSE, rule = 2))
+         pH = na.approx(pH, na.rm = FALSE, rule = 2),
+         temp = na.approx(temp, na.rm = FALSE, rule = 2),
+         do_mgL = na.approx(do_mgL, na.rm = FALSE, rule = 2))
 
 prof.clean.time = rbind(prof.clean.22.time, prof.clean.24.time)
 
