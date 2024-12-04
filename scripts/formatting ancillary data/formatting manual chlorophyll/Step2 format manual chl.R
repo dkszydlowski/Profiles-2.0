@@ -8,8 +8,12 @@ library(tidyverse)
 chl22 = read.csv("./data/raw data/manual chlorophyll/chl_fluorometer_and_concentrations.csv")
 
 # fix couple of dates that were off from actual sampling date
-chl22 = chl22 %>% mutate(Date = replace(Date, Date == "2022-06-27" & Lake == "L", "2022-06-28"))
-chl22 = chl22 %>% mutate(Date = replace(Date, Date == "2022-06-28" & Lake == "T", "2022-06-29"))
+# but need to check the binder
+chl22 = chl22 %>% mutate(Date = replace(Date, Date == "6/27/2022" & Lake == "L", "6/28/2022"))
+chl22 = chl22 %>% mutate(Date = replace(Date, Date == "6/28/2022" & Lake == "T", "6/29/2022"))
+
+# recalculate doy
+chl22 = chl22 %>% mutate(DoY = yday(mdy(Date)))
 
 # remove rows where lake is NA
 chl22 = chl22 %>% filter(!is.na(Lake))
@@ -20,6 +24,8 @@ chl22 = chl22 %>% mutate(depth.rounded = round(Depth_m * 4) / 4)
 chl22 = chl22 %>% select(Lake, Year, DoY, ZID, Depth_m, depth.rounded, Mean_Chl)
 
 chl22 = chl22 %>% rename(lake = Lake, year = Year, doy = DoY, depth = Depth_m, manual.chl = Mean_Chl)
+
+
 
 chl22 = chl22 %>% filter(year != 2021)
 
