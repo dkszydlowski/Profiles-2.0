@@ -1,5 +1,15 @@
+
+if (!require(tidyverse)) install.packages('tidyverse')
+library(tidyverse)
+
+
+##### ROUTINES #####
 #### 2022 ####
-chl22 = read.xlsx("./data/raw data/manual chlorophyll/RoutineChl_Calculated_Values_2022.xlsx", sheetIndex = 1)
+chl22 = read.csv("./data/raw data/manual chlorophyll/chl_fluorometer_and_concentrations.csv")
+
+# fix couple of dates that were off from actual sampling date
+chl22 = chl22 %>% mutate(Date = replace(Date, Date == "2022-06-27" & Lake == "L", "2022-06-28"))
+chl22 = chl22 %>% mutate(Date = replace(Date, Date == "2022-06-28" & Lake == "T", "2022-06-29"))
 
 # remove rows where lake is NA
 chl22 = chl22 %>% filter(!is.na(Lake))
@@ -12,8 +22,6 @@ chl22 = chl22 %>% select(Lake, Year, DoY, ZID, Depth_m, depth.rounded, Mean_Chl)
 chl22 = chl22 %>% rename(lake = Lake, year = Year, doy = DoY, depth = Depth_m, manual.chl = Mean_Chl)
 
 chl22 = chl22 %>% filter(year != 2021)
-
-
 
 
 #### 2024 ####
@@ -66,3 +74,12 @@ chl.22.24 = chl.22.24 %>% mutate(lake = replace(lake, lake == "Tuesday", "T")) %
 # save the overall dataframe
 write.csv(chl.22.24, "./data/formatted data/manual chlorophyll/routines chl 2024 and 2022.csv", row.names = FALSE)
 save(chl.22.24, file = "./data/formatted data/manual chlorophyll/routines chl 2024 and 2022.RData")
+
+
+
+### make a quick boxplot
+ggplot(chl.22.24, aes(x = as.factor(year), y = log10(manual.chl)))+
+  geom_boxplot()+
+  facet_wrap(~lake)+
+  theme_classic()+
+  labs( y = "log10(chlorophyll ug/L)", x = "year")

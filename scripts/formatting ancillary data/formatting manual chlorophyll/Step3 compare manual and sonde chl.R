@@ -30,11 +30,17 @@ ggplot(sonde.man.chl %>% filter(log10(chl_ugL) != -Inf), aes(x = log10(manual.ch
 
 
 
-ggplot(sonde.man.chl %>% filter(lake == "L" & chl_ugL > 0 & manual.chl > 0), aes(x = log10(manual.chl), y = log10(chl_ugL), fill = as.factor(year)))+
-  geom_point(pch = 21, size = 4, alpha = 0.7)+
+ggplot(sonde.man.chl %>% filter(lake == "L" & chl_ugL > 0 & manual.chl > 0), aes(x = log10(manual.chl), y = log10(chl_ugL), fill = as.factor(year),
+                                                                                 color = as.factor(year)))+
+  geom_point(pch = 21, size = 3, alpha = 0.6, color = "black")+
   #facet_grid(lake~year)+
   theme_classic()+
-  geom_smooth(color = "black", se = FALSE, linetype = "dashed")
+  geom_smooth( se = FALSE, linetype = "dashed")+
+  labs(x = "log10(manual chlorophyll ug/L)", y = "log10(sonde chlorophyll ug/L)", fill = "year", color = "year")+
+  theme(axis.title = element_text(size = 14))+
+  theme(axis.text = element_text(size = 14))
+  
+  
 
 
 ggplot(sonde.man.chl %>% filter(lake == "R"), aes(x = log10(manual.chl), y = log10(chl_ugL), fill = as.factor(year)))+
@@ -48,16 +54,6 @@ ggplot(sonde.man.chl %>% filter(lake == "T"), aes(x = log10(manual.chl), y = log
   #facet_grid(lake~year)+
   theme_classic()+
   geom_smooth(method = "lm", color = "black", se = FALSE, linetype = "dashed")
-
-sonde.man.chl = sonde.man.chl %>% mutate(corrected.chl = replace(chl_ugL, year == 2022, chl_ugL*2.23))
-
-ggplot(sonde.man.chl %>% filter(lake == "L" & chl_ugL > 0 & manual.chl > 0), aes(x = log10(corrected.chl), y = log10(manual.chl), fill = as.factor(year)))+
-  geom_point(pch = 21, size = 4, alpha = 0.7)+
-  #facet_grid(lake~year)+
-  theme_classic()+
-  #geom_point(aes(x = log10(chl_ugL + 7.24), y= log10(manual.chl)))+
-  geom_smooth(method = "lm", color = "black", se = FALSE, linetype = "dashed")
-
 
 
 
