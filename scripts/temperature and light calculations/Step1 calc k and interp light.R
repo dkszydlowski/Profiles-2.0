@@ -160,3 +160,132 @@ save(light.maps.all, file = "./data/formatted data/light/interpolated light prof
 write.csv(k, "./data/formatted data/light/light extinction coefficients 2022 and 2024.csv", row.names = FALSE)
 save(k, file = "./data/formatted data/light/light extinction coefficients 2022 and 2024.RData")
 
+
+
+
+#### make a version of k that is the percent light for all depths and all dates estimated
+# over time for both 2022 and 2024
+
+### 2022 ###
+
+k.22 = k %>% filter(year == 2022)
+
+k.22.exp = expand.grid(doy = seq(min(k.22$doy, na.rm = TRUE), max(k.22$doy, na.rm = TRUE)),
+                       lake = unique(k.22$lake),
+                       depth = seq(0, 8, 0.25))
+
+k.22.exp = k.22.exp %>% full_join(k.22, by = c("doy", "lake")) %>% 
+  mutate(year = 2022)
+
+
+# interpolate k
+k.22.exp = k.22.exp %>% group_by(lake, depth) %>% 
+  arrange(doy) %>% 
+  mutate(k = na.approx(k, rule = 2))
+
+
+# calculate percent light
+k.22.exp = k.22.exp %>% mutate(perc.light = 100*exp(k*depth),
+                               kcrit.depth = na.approx(kcrit.depth, rule = 2))
+
+
+
+
+ggplot(k.22.exp, aes_string("as.factor(doy)", "depth", fill = "(perc.light)")) +
+  geom_tile() +
+  theme_classic() +
+  scale_y_reverse() +
+  facet_grid(year ~ lake) +
+  #geom_point(aes(x = as.factor(DOY), y = kcrit.depth, group = interaction(year, lake)), inherit.aes = FALSE, color = "black") +
+  geom_line(data = k.22.exp %>% filter(!is.na(kcrit.depth)), 
+            aes(x = as.factor(doy), y = kcrit.depth, group = interaction(year, lake)), 
+            linetype = "dashed", size = 0.5, inherit.aes = FALSE, color = "white") +
+  labs(x = "day of year", y = "depth (m)") +
+  scale_fill_gradientn(
+    name = "light",
+    colors = c("lightblue", "lightblue3","lightblue4", "darkblue", "black"), # Black at bottom, dark blue in the middle, yellow at the surface
+    values = c(0, 0.5, 0.75, 0.9, 1), # Control the distribution of the gradient
+    trans = "reverse" # Reverse the scale
+  ) +
+  scale_x_discrete(breaks = as.character(c(140, 150, 170, 190, 211, 233)))
+
+
+
+
+
+### 2024 ###
+
+k.24 = k %>% filter(year == 2024)
+
+k.24.exp = expand.grid(doy = seq(min(k.24$doy, na.rm = TRUE), max(k.24$doy, na.rm = TRUE)),
+                       lake = unique(k.24$lake),
+                       depth = seq(0, 8, 0.25))
+
+k.24.exp = k.24.exp %>% full_join(k.24, by = c("doy", "lake")) %>% 
+  mutate(year = 2024)
+
+
+# interpolate k
+k.24.exp = k.24.exp %>% group_by(lake, depth) %>% 
+  arrange(doy) %>% 
+  mutate(k = na.approx(k, rule = 2))
+
+
+# calculate percent light
+k.24.exp = k.24.exp %>% mutate(perc.light = 100*exp(k*depth),
+                               kcrit.depth = na.approx(kcrit.depth, rule = 2))
+
+
+
+
+ggplot(k.24.exp, aes_string("as.factor(doy)", "depth", fill = "(perc.light)")) +
+  geom_tile() +
+  theme_classic() +
+  scale_y_reverse() +
+  facet_grid(year ~ lake) +
+  #geom_point(aes(x = as.factor(DOY), y = kcrit.depth, group = interaction(year, lake)), inherit.aes = FALSE, color = "black") +
+  geom_line(data = k.24.exp %>% filter(!is.na(kcrit.depth)), 
+            aes(x = as.factor(doy), y = kcrit.depth, group = interaction(year, lake)), 
+            linetype = "dashed", size = 0.5, inherit.aes = FALSE, color = "white") +
+  labs(x = "day of year", y = "depth (m)") +
+  scale_fill_gradientn(
+    name = "light",
+    colors = c("lightblue", "lightblue3","lightblue4", "darkblue", "black"), # Black at bottom, dark blue in the middle, yellow at the surface
+    values = c(0, 0.5, 0.75, 0.9, 1), # Control the distribution of the gradient
+    trans = "reverse" # Reverse the scale
+  ) +
+  scale_x_discrete(breaks = as.character(c(140, 150, 170, 190, 211, 233)))
+
+
+
+
+
+## combine both expanded k dataframes
+k.22.24.exp = rbind(k.22.exp, k.24.exp)
+
+
+
+ggplot(k.22.24.exp, aes_string("as.factor(doy)", "depth", fill = "(perc.light)")) +
+  geom_tile() +
+  theme_classic() +
+  scale_y_reverse() +
+  facet_grid(year ~ lake) +
+  #geom_point(aes(x = as.factor(DOY), y = kcrit.depth, group = interaction(year, lake)), inherit.aes = FALSE, color = "black") +
+  geom_line(data = k.22.24.exp %>% filter(!is.na(kcrit.depth)), 
+            aes(x = as.factor(doy), y = kcrit.depth, group = interaction(year, lake)), 
+            linetype = "dashed", size = 0.5, inherit.aes = FALSE, color = "white") +
+  labs(x = "day of year", y = "depth (m)") +
+  scale_fill_gradientn(
+    name = "light",
+    colors = c("lightblue", "lightblue3","lightblue4", "darkblue", "black"), # Black at bottom, dark blue in the middle, yellow at the surface
+    values = c(0, 0.5, 0.75, 0.9, 1), # Control the distribution of the gradient
+    trans = "reverse" # Reverse the scale
+  ) +
+  scale_x_discrete(breaks = as.character(c(140, 150, 170, 190, 211, 233)))
+
+
+
+#### write the interpolated light to a dataframe ###
+
+write.csv(k.22.24.exp, "./data/formatted data/light/interpolated light 2022 and 2024.csv", row.names = FALSE)
+save(k.22.24.exp, file = "./data/formatted data/light/interpolated light 2022 and 2024.RData")

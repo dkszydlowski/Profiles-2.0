@@ -31,3 +31,9 @@ light.22.24 = rbind(light.22, light.24)
 # save the datasets as both an R file and a csv
 write.csv(light.22.24, "./data/formatted data/light/light profiles 2022 and 2024.csv", row.names = FALSE)
 save(light.22.24, file = "./data/formatted data/light/light profiles 2022 and 2024.RData")
+
+
+# make a version that is all depths and dates with light calculated light maps
+
+
+

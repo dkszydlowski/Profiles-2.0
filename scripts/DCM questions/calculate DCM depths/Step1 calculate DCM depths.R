@@ -86,8 +86,9 @@ ggplot(prof.all.interp, aes_string("doy", "depth", fill = "log10(chl_ugL)"))+
   geom_point(data = DCM.depths, aes(x = doy, y = depth, group = lake), pch = 21, fill = "white", alpha = 0.7, inherit.aes = FALSE)
 
 
-
-
+# save the DCM depths 
+write.csv(DCM.depths, "./data/formatted data/DCM depths/DCM depths.csv", row.names = FALSE)
+save(DCM.depths, file = "./data/formatted data/DCM depths/DCM depths.RData")
 
 
 ##### calculate the deep phycocyanin maximum
@@ -239,7 +240,10 @@ ggplot(prof.all.interp, aes_string("doy", "depth", fill = "(do_percent)"))+
   facet_grid(year~lake)+
   #scale_fill_distiller(palette = "BrBG")
   scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse")+
-  geom_line(data = DOM.depths, aes(x = doy, y = depth, group = lake), linewidth = 0.7, pch = 21, fill = "white", alpha = 0.7, inherit.aes = FALSE)
+  geom_line(data = DOM.depths, aes(x = doy, y = depth, group = lake), linewidth = 0.7, pch = 21, fill = "white", alpha = 0.7, inherit.aes = FALSE)+
+  geom_point(data = DCM.depths %>% filter(doy <= 234), 
+             aes(x = (doy), y = DCM.depth, group = interaction(year, lake)), 
+             size = 1, inherit.aes = FALSE, color = "black")
 
 
 
