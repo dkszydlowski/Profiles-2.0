@@ -9,7 +9,12 @@ library(tidyverse)
 prof.clean.time = get(load(file = "./data/formatted data/cleaned profiles interpolated over depth and time.RData"))
 
 # load in manual chl
+# acid corrected
 chl.22.24 = get(load(file = "./data/formatted data/manual chlorophyll/routines chl 2024 and 2022.RData"))
+
+# no acid correction
+#chl.22.24 = get(load(file = "./data/formatted data/manual chlorophyll/routines chl 2024 and 2022 no acid correction.RData"))
+
 
 # need to change names of chl.22.24 so that depth refers to the rounded depths
 chl.22.24 = chl.22.24 %>% rename(depth.actual = depth, depth = depth.rounded)

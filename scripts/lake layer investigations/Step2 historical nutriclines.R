@@ -174,10 +174,14 @@ ggplot(nuts.avg %>% filter(depth_id != -2 & depth_id != -1), aes(x = (mean.tn), 
   facet_grid(~lakeid)
 
 
-ggplot(nuts.avg %>% filter(depth_id != -2 & depth_id != -1), aes(x = (mean.tp), y = as.numeric(mean.depth), color = lakeid))+
+ggplot(nuts.avg %>% filter(depth_id != -2 & depth_id != -1), aes(x = (mean.tp), y = as.numeric(mean.depth)))+
   geom_point()+
   geom_path(size = 1)+
   scale_y_reverse()+
-  theme_classic()
-  #facet_grid(~lakeid)
+  theme_classic()+
+  facet_grid(~lakeid)
 
+
+# view nutrients over time
+ggplot(nuts %>% filter(lakeid == "R" & depth > 8), aes(x = year4, y = tp_ug))+
+  geom_point()
