@@ -113,3 +113,7 @@ ggplot(total.nuts %>% filter(is.na(flag)), aes(x = depth, y = TN))+
 total.nuts24 = total.nuts %>% filter(year == 2024)
 
 write.csv(total.nuts24, "./data/formatted data/2024 TN TP.csv", row.names = FALSE)
+
+
+write.csv(total.nuts, "./data/formatted data/nutrients/2024 and 2022 TN TP.csv", row.names = FALSE)
+save(total.nuts, file = "./data/formatted data/nutrients/2024 and 2022 TN TP.RData")
