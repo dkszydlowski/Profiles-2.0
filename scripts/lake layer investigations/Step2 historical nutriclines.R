@@ -185,3 +185,6 @@ ggplot(nuts.avg %>% filter(depth_id != -2 & depth_id != -1), aes(x = (mean.tp), 
 # view nutrients over time
 ggplot(nuts %>% filter(lakeid == "R" & depth > 8), aes(x = year4, y = tp_ug))+
   geom_point()
+
+
+

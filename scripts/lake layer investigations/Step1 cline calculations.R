@@ -446,3 +446,56 @@ ggplot(all.clines %>% filter(variable %in% c("phyco_cells", "TP")), aes(x = mean
   scale_color_manual(values = c("phyco_cells" = "forestgreen", "TP" = "black")) +
   scale_fill_manual(values = c("phyco_cells" = "forestgreen", "TP" = "cyan")) +  # Use matching green for fill
   theme_classic()
+
+
+
+
+
+### calculate oxycline over time using the profiles data ###
+oxycline = profiles %>% filter(do_mgL <= 0.5) %>% 
+  group_by(lake, doy, year) %>% 
+  summarize(oxycline = min(depth, na.rm = TRUE)) %>% 
+  ungroup()
+
+
+ggplot(oxycline %>% filter(year == 2024), aes(x = doy, y = oxycline, color = lake))+
+  geom_point()+
+  geom_line()+
+  theme_bw()+
+  scale_y_reverse()+
+  facet_wrap(~year)+
+  scale_color_manual(values = c("R" = '#1F78B4', "L" = '#FED976', "T" = '#8C510A'))
+
+# make a heatmap of oxygen and plot over it by lake #
+ggplot(profiles %>% filter(depth <= 8 & year == 2024), aes_string("as.factor(doy)", "depth", fill = "do_mgL"))+
+  geom_tile()+
+  #labs(title = if(lake_picked == "T") {"Tuesday"}else if(lake_picked == "L"){"Paul"} else if (lake_picked == "R"){"Peter"})+
+  theme_classic()+
+  scale_y_reverse()+
+  facet_grid(lake~year)+
+  labs(x = "day of year", y = "depth (m)")+
+  #scale_fill_distiller(palette = "BrBG")
+  scale_fill_gradientn(name = "DO (mg/L)", colors = hcl.colors(20, "Spectral"), trans = "reverse")+
+  scale_x_discrete(breaks =as.character(c(162, 172, 180, 190, 199, 208, 218, 227)))
+
+
+
+### combine the plots
+ggplot(profiles %>% filter(depth <= 8), 
+       aes(x = as.factor(doy), y = depth, fill = do_mgL)) +
+  geom_tile() +
+  # Overlay oxycline data
+  geom_point(data = oxycline, 
+             aes(x = as.factor(doy), y = oxycline), inherit.aes = FALSE) +
+  geom_line(data = oxycline, 
+            aes(x = as.factor(doy), y = oxycline), inherit.aes = FALSE) +
+  theme_classic() +
+  scale_y_reverse() +
+  facet_grid(lake ~ year) +
+  labs(x = "day of year", y = "depth (m)", fill = "DO (mg/L)") +
+  scale_fill_gradientn(colors = hcl.colors(20, "Spectral"), trans = "reverse") +
+  # scale_color_manual(values = c("R" = '#1F78B4', "L" = '#FED976', "T" = '#8C510A')) +
+  scale_x_discrete(breaks = as.character(c(162, 172, 180, 190, 199, 208, 218, 227)))
+
+
+write.csv(oxycline %>% filter(year != 2022), "./data/formatted data/cline depths/oxycline depths profiles 2024 DKS.csv", row.names = FALSE)

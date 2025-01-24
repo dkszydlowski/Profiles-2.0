@@ -174,55 +174,140 @@ ggplot() +
 
 
 
+
+
+
+
+
 ### interpolated version ###
-prof.norm.interp = prof.norm %>% ungroup() %>% 
-  mutate(phyco_norm = replace(phyco_norm, is.na(phyco_norm), 0),
-          chl_norm = replace(chl_norm, is.na(chl_norm), 0))
+# prof.norm.interp = prof.norm %>% ungroup() %>% 
+#   mutate(phyco_norm = replace(phyco_norm, is.na(phyco_norm), 0),
+#           chl_norm = replace(chl_norm, is.na(chl_norm), 0))
+# 
+# prof.norm.interp <- prof.norm.interp %>%
+#   mutate(
+#     pigment = ifelse(phyco_norm > chl_norm | is.na(chl_norm), "phycocyanin", "chlorophyll"),
+#     fill_value = ifelse(pigment == "phycocyanin", phyco_norm, chl_norm)
+#   )
 
-prof.norm.interp <- prof.norm.interp %>%
+
+
+
+##### COMBINED HEATMAP RED + BLUE MAKE PURPLE ######
+
+# read in the profiles data
+profiles = get(load("./data/formatted data/cleaned profiles interpolated over depth and time.RData"))
+
+# normalize pigments
+profiles = profiles %>% select(lake, doy, depth, year, chl_ugL, phyco_cells)
+
+
+prof.norm <- profiles %>%
+  group_by(lake, year) %>%
   mutate(
-    pigment = ifelse(phyco_norm > chl_norm | is.na(chl_norm), "phycocyanin", "chlorophyll"),
-    fill_value = ifelse(pigment == "phycocyanin", phyco_norm, chl_norm)
-  )
+    chl_ugL = log10(chl_ugL),
+    phyco_cells = log10(phyco_cells)) %>%
+  mutate(chl_ugL = replace(chl_ugL, is.infinite(chl_ugL), NA), 
+         phyco_cells = replace(phyco_cells, is.infinite(phyco_cells), NA)) %>%
+  mutate(chl_ugL = (chl_ugL - min(chl_ugL, na.rm = TRUE)) / (max(chl_ugL, na.rm = TRUE) - min(chl_ugL, na.rm = TRUE)),
+    phyco_cells = (phyco_cells - min(phyco_cells, na.rm = TRUE)) / (max(phyco_cells, na.rm = TRUE) - min(phyco_cells, na.rm = TRUE)))
 
 
 
 
 
-
-
-ggplot() +
-  # Layer 1: Phycocyanin with blue-cyan gradient
-  geom_tile(
-    data = filter(prof.norm.interp, pigment == "phycocyanin"),
-    aes(x = doy, y = depth, fill = fill_value)
-  ) +
+ggplot(prof.norm, aes(x = doy, y = depth)) +
+  # First layer: Chlorophyll
+  geom_tile(aes(fill = chl_ugL)) +
+  scale_y_reverse() +
   scale_fill_gradientn(
-    colors = c("#070D17", "cyan"),
-    limits = c(0, 1),  # Ensure full range of normalization
-    name = "Phycocyanin"
-  ) +
-  new_scale_fill() +  # Reset the fill scale
-  
-  # Layer 2: Chlorophyll with green-yellowgreen gradient
-  geom_tile(
-    data = filter(prof.norm.interp, pigment == "chlorophyll"),
-    aes(x = doy, y = depth, fill = fill_value)
-  ) +
-  scale_fill_gradientn(
-    colors = c("#011800", "chartreuse"),
-    limits = c(0, 1),  # Ensure full range of normalization
+    colors = c("#FF7D7D", "#640000"),
     name = "Chlorophyll"
   ) +
-  
-  # Formatting and labels
-  scale_y_reverse() +
-  facet_grid(year ~ lake) +
-  theme_classic() +
-  labs(
-    title = "Pigment Dominance Heatmap",
-    x = "Day of Year (DOY)",
-    y = "Depth (m)"
-  )
+  # Add facets
+  facet_wrap(year~lake) +
+  # Separate scales for Phycocyanin
+  new_scale_fill() +
+  geom_tile(aes(fill = phyco_cells, alpha = phyco_cells, fill = "#002E50"))
+  theme_classic()
 
+
+  
+  ggplot(prof.norm, aes(x = doy, y = depth)) +
+    # First layer: Chlorophyll
+    geom_tile(aes(fill = chl_ugL)) +
+    scale_y_reverse() +
+    scale_fill_gradientn(
+      colors = c("#FF7D7D", "#640000"),
+      name = "Chlorophyll"
+    ) +
+    # Add facets
+    facet_wrap(year~lake) +
+    # Separate scales for Phycocyanin
+    new_scale_fill() +
+    geom_tile(aes(fill = phyco_cells, alpha = phyco_cells, fill = "#002E50"))
+  theme_classic()
+  
+  
+  
+  
+  ggplot(prof.norm, aes(x = doy, y = depth)) +
+    # First layer: Chlorophyll
+    geom_tile(aes(fill = chl_ugL)) +
+    scale_y_reverse() +
+    scale_fill_gradientn(
+      colors = c("#FF7D7D", "#640000"),
+      name = "Chlorophyll"
+    ) +
+    # Add facets
+    facet_wrap(year ~ lake) +
+    # Separate scales for Phycocyanin
+    new_scale_fill() +
+    geom_tile(aes(alpha = phyco_cells, fill = phyco_cells)) +
+    scale_alpha_continuous(range = c(0, 0.8)) +  # Scale alpha so max is 0.8
+    theme_classic()
+
+
+
+ggplot(prof.norm, aes(x = doy, y = depth)) +
+  # First layer: Chlorophyll with custom breaks
+  geom_tile(aes(fill = chl_ugL)) +
+  scale_y_reverse() +
+  scale_fill_gradientn(
+    colors = c("white", "white", "red4"),
+    values = c(0, 0.2, 1),  # Define gradient breaks
+    name = "Chlorophyll"
+  ) +
+  # Add facets
+  facet_wrap(year~lake) +
+  # Separate scale for Phycocyanin
+  new_scale_fill() +
+  geom_tile(aes(fill = phyco_cells), alpha = 0.6) +
+  scale_fill_gradientn(
+    colors = c("white", "white", "blue4"),
+    values = c(0, 0.2, 1),  # Define gradient breaks
+    name = "Phycocyanin"
+  )+
+  theme_classic()
+
+
+
+ggplot(prof.norm, aes(x = doy, y = depth)) +
+  # First layer: Chlorophyll with red scale
+  geom_tile(aes(fill = chl_ugL), alpha = 0.7) +
+  scale_y_reverse() +
+  scale_fill_gradientn(
+    colors = c("white", "red4"),
+    name = "Chlorophyll"
+  ) +
+  # Add facets
+  facet_wrap(~lake) +
+  # Separate scale for Phycocyanin
+  new_scale_fill() +
+  geom_tile(aes(fill = phyco_cells), alpha = 0.7) +
+  scale_fill_gradientn(
+    colors = c("white", "blue4"),
+    name = "Phycocyanin"
+  )+
+  theme_classic()
 

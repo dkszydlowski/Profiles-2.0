@@ -39,7 +39,7 @@ for(i in 1:length(lakes)){
       select(-lake, -year, -doy)
     
     thermoclines = ts.thermo.depth(data, seasonal = TRUE)
-    metalimnion = ts.meta.depths(data)
+    metalimnion = ts.meta.depths(data, slope = 0.5)
     
     thermoclines$lake = cur.lake
     thermoclines$year = cur.year
