@@ -213,24 +213,39 @@ prof.norm <- profiles %>%
     phyco_cells = (phyco_cells - min(phyco_cells, na.rm = TRUE)) / (max(phyco_cells, na.rm = TRUE) - min(phyco_cells, na.rm = TRUE)))
 
 
-
+prof.norm = prof.norm %>% mutate(phyco.transparency = (phyco_cells - min(phyco_cells, na.rm = TRUE)) / (max(phyco_cells, na.rm = TRUE) - min(phyco_cells, na.rm = TRUE)) )
+prof.norm = prof.norm %>% mutate(chl.transparency = (chl_ugL - min(chl_ugL, na.rm = TRUE)) / (max(chl_ugL, na.rm = TRUE) - min(chl_ugL, na.rm = TRUE)) )
 
 
 ggplot(prof.norm, aes(x = doy, y = depth)) +
   # First layer: Chlorophyll
-  geom_tile(aes(fill = chl_ugL)) +
+  geom_tile(aes(fill = "red", alpha = chl.transparency)) +
   scale_y_reverse() +
-  scale_fill_gradientn(
-    colors = c("#FF7D7D", "#640000"),
-    name = "Chlorophyll"
-  ) +
   # Add facets
   facet_wrap(year~lake) +
   # Separate scales for Phycocyanin
   new_scale_fill() +
-  geom_tile(aes(fill = phyco_cells, alpha = phyco_cells, fill = "#002E50"))
-  theme_classic()
+  geom_tile(aes(fill = "blue", alpha = phyco.transparency))
 
+
+  
+  
+  ggplot(prof.norm, aes(x = doy, y = depth)) +
+    # First layer: Chlorophyll
+    geom_tile(aes(fill = chl.transparency, alpha = chl.transparency)) +
+    scale_y_reverse() +
+    scale_fill_gradient(low = "white", high = "blue", name = "Chlorophyll") +
+    # Add facets
+    facet_wrap(year ~ lake) +
+    # Separate scales for Phycocyanin
+    new_scale_fill() +
+    geom_tile(aes(fill = phyco.transparency, alpha = phyco.transparency)) +
+    scale_fill_gradient(low = "white", high = "red", name = "Phycocyanin") +
+    # Ensure alpha scales work across layers
+    scale_alpha(range = c(0, 0.8), guide = "none") +
+    theme_classic()
+  
+  ### problem is that I need to scale phyco clls so that the fill is between 0 and 1
 
   
   ggplot(prof.norm, aes(x = doy, y = depth)) +
@@ -310,4 +325,34 @@ ggplot(prof.norm, aes(x = doy, y = depth)) +
     name = "Phycocyanin"
   )+
   theme_classic()
+
+
+
+### NTL LTER symposium figure ###
+
+png("./figures/NTL LTER symposium figures/combined pigment heatmap.png", height = 11, width = 8, units = "in", res = 300)
+
+ggplot(prof.norm, aes(x = doy, y = depth)) +
+  theme_bw()+
+  geom_tile(aes(fill = chl.transparency)) +
+  scale_y_reverse() +
+  scale_fill_gradient(low = "white", high = "blue", name = "Chlorophyll",   breaks = c(0, 0.5, 1)) +
+  # Add facets
+  facet_grid(lake~year,
+             labeller = labeller(lake = c("L" = "Reference Lake", "R" = "Nutrients + Dye", "T" = "Nutrients"), 
+                                 year = c("2022" = "Reference Year", "2024" = "Experimental Year")))+
+  labs(y = "depth (m)", x = "day of year")+
+  # Separate scales for Phycocyanin
+  new_scale_fill() +
+  geom_tile(aes(fill = phyco.transparency, alpha = phyco.transparency)) +
+  scale_fill_gradient(low = "white", high = "red", name = "Phycocyanin",   breaks = c(0, 0.5, 1)) +
+  # Ensure alpha scales work across layers and remove alpha legend if needed
+  scale_alpha(range = c(0, 0.6), guide = "none") +
+  theme(axis.text = element_text(size = 18), axis.title = element_text(size = 24),
+        legend.title = element_text(size = 14), strip.text = element_text(size = 20), legend.position = "top",
+        legend.text = element_text(size = 10))
+
+dev.off()
+
+
 
